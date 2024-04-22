@@ -1,0 +1,149 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://maven.parchmentmc.org' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.parchmentmc:librarian:1.+'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'maven-publish'
+
+repositories {
+    maven {
+        url "https://dvs1.progwml6.com/files/maven/"
+    }
+}
+
+version = '0.1.2'
+group = 'dev.wintersky.workbench' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'Workbench-UNKNOWN'
+
+project.afterEvaluate {
+    archivesBaseName = "Workbench-${project.MC_VERSION}"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+
+sourceSets {
+    main.resources.srcDirs += 'src/main/generated_resources'
+}
+
+minecraft {
+    //mappings channel: 'parchment', version: '2022.03.13-1.18.2'
+    mappings channel: 'official', version: '1.18.2'
+
+    accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', ''
+            property 'forge.logging.console.level', 'debug'
+
+            forceExit false
+
+            mods {
+                thismod {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', ''
+            property 'forge.logging.console.level', 'debug'
+
+            forceExit false
+
+            mods {
+                thismod {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', ''
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'workbench', '--all', '--output', file('src/main/generated_resources/'), '--existing', file('src/main/resources/')
+
+            forceExit false
+
+            mods {
+                thismod {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.18.2-40.0.44'
+
+    compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.5.5.174:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.5.5.174")
+}
+
+jar {
+    from('/') {
+        include 'LICENSE.txt'
+    }
+
+    manifest {
+        attributes([
+            "Specification-Title": "workbench",
+            "Specification-Vendor": "wintersky",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": "workbench",
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"wintersky",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "Automatic-Module-Name": "dev.wintersky.workbench"
+        ])
+    }
+}
+
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
+project.afterEvaluate {
+    publish.dependsOn('reobfJar')
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId project.archivesBaseName
+                from components.java
+
+                pom.withXml {
+                    asNode().dependencies.dependency.each { dep ->
+                        if (dep.groupId.last().value().last() in ["net.minecraftforge", "mezz.jei"]) {
+                            assert dep.parent().remove(dep)
+                        }
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                url "$projectDir/../CommonMaven"
+            }
+        }
+    }
+}

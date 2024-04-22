@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,model=main": {
+      "model": "workbench:block/workbench"
+    },
+    "facing=south,model=main": {
+      "model": "workbench:block/workbench",
+      "y": 180
+    },
+    "facing=west,model=main": {
+      "model": "workbench:block/workbench",
+      "y": 270
+    },
+    "facing=east,model=main": {
+      "model": "workbench:block/workbench",
+      "y": 90
+    },
+    "facing=north,model=side": {
+      "model": "workbench:block/workbench"
+    },
+    "facing=south,model=side": {
+      "model": "workbench:block/workbench",
+      "y": 180
+    },
+    "facing=west,model=side": {
+      "model": "workbench:block/workbench",
+      "y": 270
+    },
+    "facing=east,model=side": {
+      "model": "workbench:block/workbench",
+      "y": 90
+    }
+  }
+}

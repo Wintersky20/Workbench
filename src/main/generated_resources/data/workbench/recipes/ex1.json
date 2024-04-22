@@ -1,0 +1,26 @@
+{
+  "type": "workbench:crafting",
+  "materials": [
+    {
+      "ingredient": {
+        "tag": "forge:leather"
+      },
+      "count": 1
+    },
+    {
+      "ingredient": {
+        "tag": "forge:string"
+      },
+      "count": 1
+    }
+  ],
+  "tool": {
+    "tag": "forge:shears"
+  },
+  "second_tool": {
+    "tag": "forge:shears"
+  },
+  "result": {
+    "item": "minecraft:leather_helmet"
+  }
+}
